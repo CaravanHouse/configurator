@@ -9,6 +9,8 @@ import { registerHandlers, telegramNotifier } from "./bot";
 const token = process.env.BOT_TOKEN;
 const adminChatId = process.env.ADMIN_CHAT_ID;
 const port = Number(process.env.PORT ?? 3000);
+// На Railway укажите путь к подключённому Volume (например /data), иначе данные сотрутся при деплое
+const dataDir = process.env.DATA_DIR || join(process.cwd(), "data");
 
 const bot = token ? new Bot(token) : null;
 const notifier: Notifier =
@@ -16,7 +18,7 @@ const notifier: Notifier =
 if (!bot) console.warn("BOT_TOKEN не задан: заявки только сохраняются в data/leads.json");
 if (bot && !adminChatId) console.warn("ADMIN_CHAT_ID не задан: напишите боту /id и впишите значение в .env");
 
-const leads = new Leads(join(process.cwd(), "data", "leads.json"), notifier);
+const leads = new Leads(join(dataDir, "leads.json"), notifier);
 const dist = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 createApp(leads, dist, process.env.TRUST_PROXY === "1").listen(port, () => console.log(`Конфигуратор: http://localhost:${port}`));
 

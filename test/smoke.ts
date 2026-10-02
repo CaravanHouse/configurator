@@ -62,6 +62,10 @@ assert.equal(leads.get(1)?.status, "new", "чужой чат не может м�
 await bot.handleUpdate(cb(555, "lead:1:taken"));
 assert.equal(leads.get(1)?.status, "taken");
 assert.ok(calls.some((c) => c.method === "editMessageText" && String(c.payload.text).includes("В работе") && String(c.payload.text).includes("@boss")), "сообщение обновлено, виден кто взял");
+const edits = calls.filter((c) => c.method === "editMessageText").length;
+await bot.handleUpdate(cb(555, "lead:1:taken"));
+assert.equal(calls.filter((c) => c.method === "editMessageText").length, edits, "повторный тап не редактирует сообщение");
+assert.equal(calls.at(-1)?.method, "answerCallbackQuery", "но кнопка отвечает");
 
 console.log("✓ все проверки пройдены");
 process.exit(0);

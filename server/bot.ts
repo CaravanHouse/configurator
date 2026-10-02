@@ -51,8 +51,11 @@ export function registerHandlers(bot: Bot, leads: Leads, adminChatId?: string) {
   bot.callbackQuery(/^lead:(\d+):(new|taken|done|rejected)$/, async (ctx) => {
     if (!isAdmin(ctx.chat?.id)) return ctx.answerCallbackQuery({ text: "Нет доступа", show_alert: true });
     const id = Number(ctx.match[1]);
+    const status = ctx.match[2] as LeadStatus;
+    // повторный тап: статус уже такой, сообщение не трогаем (иначе Telegram ответит «message is not modified»)
+    if (leads.get(id)?.status === status) return ctx.answerCallbackQuery({ text: STATUS_LINE[status] });
     const by = ctx.from.username ? `@${ctx.from.username}` : ctx.from.first_name;
-    const lead = leads.setStatus(id, ctx.match[2] as LeadStatus, by);
+    const lead = leads.setStatus(id, status, by);
     if (!lead) return ctx.answerCallbackQuery({ text: "Заявка не найдена" });
     await ctx.editMessageText(leadText(lead), { parse_mode: "HTML", reply_markup: leadKeyboard(lead) });
     return ctx.answerCallbackQuery({ text: STATUS_LINE[lead.status] });
