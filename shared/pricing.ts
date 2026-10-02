@@ -85,7 +85,8 @@ export function validateSelection(raw: unknown): Selection | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
   if (!Array.isArray(r.types) || !Array.isArray(r.features) || typeof r.urgency !== "string") return null;
-  if (!(r.urgency in URGENCY)) return null;
+  // собственный ключ, а не `in`: иначе "constructor" или "toString" проходят проверку и смета считается как NaN
+  if (!Object.prototype.hasOwnProperty.call(URGENCY, r.urgency)) return null;
   const typeIds = new Set(TYPES.map((t) => t.id as string));
   const types = [...new Set(r.types)].filter((t): t is TypeId => typeof t === "string" && typeIds.has(t));
   if (types.length === 0 || types.length !== new Set(r.types).size) return null;
