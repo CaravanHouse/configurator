@@ -43,8 +43,9 @@ export default function App() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ selection, name, contact, comment, website }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Не удалось отправить заявку");
+      // при сбое прокси или перезапуске сервера ответ может прийти не в JSON
+      const data = (await res.json().catch(() => ({}))) as { id?: number; error?: string };
+      if (!res.ok || typeof data.id !== "number") throw new Error(data.error ?? "Не удалось отправить заявку, попробуйте ещё раз");
       setPhase({ name: "done", id: data.id });
     } catch (err) {
       setPhase({ name: "error", message: (err as Error).message });

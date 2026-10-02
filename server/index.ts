@@ -3,6 +3,7 @@ import { Bot } from "grammy";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createApp } from "./app";
+import { onRailway } from "./env";
 import { Leads, type Notifier } from "./leads";
 import { registerHandlers, telegramNotifier } from "./bot";
 
@@ -20,11 +21,15 @@ if (bot && !adminChatId) console.warn("ADMIN_CHAT_ID не задан: напиш
 
 const leads = new Leads(join(dataDir, "leads.json"), notifier);
 const dist = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
-createApp(leads, dist, process.env.TRUST_PROXY === "1").listen(port, () => console.log(`Конфигуратор: http://localhost:${port}`));
+// За прокси Railway без trust proxy у всех посетителей один IP, и лимит заявок блокировал бы всех сразу.
+// На Railway включаем сами, TRUST_PROXY=0 отключает.
+const trustProxy = process.env.TRUST_PROXY === "1" || (onRailway && process.env.TRUST_PROXY !== "0");
+createApp(leads, dist, trustProxy).listen(port, () => console.log(`Конфигуратор: http://localhost:${port}`));
 
 if (bot) {
   registerHandlers(bot, leads, adminChatId);
   bot.catch((e) => console.error("Ошибка бота:", e.message));
   void bot.start({ onStart: (me) => console.log(`Бот @${me.username} запущен`) });
 }
-process.on("SIGTERM", () => { leads.db.flush(); process.exit(0); });
+// Railway останавливает сервис через SIGTERM: успеваем записать данные на диск
+for (const signal of ["SIGTERM", "SIGINT"] as const) process.on(signal, () => { leads.db.flush(); process.exit(0); });

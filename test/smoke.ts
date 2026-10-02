@@ -22,6 +22,9 @@ assert.ok(rush.total > estimate({ types: ["bot"], features: [], urgency: "normal
 // 2. валидация выбора
 assert.equal(validateSelection({ types: ["hack"], features: [], urgency: "normal" }), null, "неизвестное направление");
 assert.equal(validateSelection({ types: ["bot"], features: [], urgency: "free" }), null, "неизвестная срочность");
+for (const urgency of ["constructor", "toString", "__proto__"]) {
+  assert.equal(validateSelection({ types: ["bot"], features: [], urgency }), null, `служебный ключ ${urgency} не проходит как срочность`);
+}
 assert.deepEqual(validateSelection({ types: ["bot"], features: ["site-seo", "bot-pay"], urgency: "normal" })?.features, ["bot-pay"], "чужие функции отбрасываются");
 
 // 3. API заявок
