@@ -1,0 +1,61 @@
+:root { --ivory:#f7f3ea; --paper:#fffdf8; --indigo:#1c2b5e; --turq:#13999c; --saffron:#f0b13a; --ink:#1b2236; --soft:#5f6882; --line:#e4dfd0; font-family:"Golos Text",system-ui,sans-serif; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ivory); color:var(--ink); }
+button,input,textarea { font:inherit; color:inherit; }
+button { cursor:pointer; } button:disabled { cursor:not-allowed; opacity:.55; }
+:focus-visible { outline:2px solid var(--turq); outline-offset:2px; }
+.wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
+.band { background-color:var(--indigo); background-image:linear-gradient(45deg,rgba(255,255,255,.06) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.06) 75%),linear-gradient(45deg,rgba(255,255,255,.06) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.06) 75%); background-size:36px 36px; background-position:0 0,18px 18px; color:#fff; }
+.bar { display:flex; align-items:baseline; gap:14px; padding-top:18px; padding-bottom:18px; }
+.logo { font-family:"Montserrat Alternates",sans-serif; font-weight:700; font-size:20px; }
+.tag { color:rgba(255,255,255,.7); font-size:14px; }
+.hero { padding:40px 0 26px; max-width:720px; }
+h1 { font-family:"Montserrat Alternates",sans-serif; font-weight:700; font-size:clamp(30px,5vw,46px); line-height:1.08; margin:0 0 12px; color:var(--indigo); letter-spacing:-.01em; }
+.hero p { color:var(--soft); margin:0; font-size:17px; line-height:1.5; }
+.layout { display:grid; gap:28px; grid-template-columns:1fr; padding-bottom:120px; }
+@media (min-width:900px) { .layout { grid-template-columns:1fr 340px; align-items:start; padding-bottom:60px; } }
+fieldset { border:0; padding:0; margin:0 0 30px; min-width:0; }
+legend { font-family:"Montserrat Alternates",sans-serif; font-weight:700; font-size:20px; padding:0; margin-bottom:12px; color:var(--indigo); }
+.types { display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+.card { position:relative; display:flex; flex-direction:column; gap:6px; padding:16px; border:2px solid var(--line); border-radius:16px; background:var(--paper); cursor:pointer; }
+.card input { position:absolute; opacity:0; }
+.card b { font-size:17px; } .card span { color:var(--soft); font-size:14px; line-height:1.35; } .card em { font-style:normal; color:var(--turq); font-weight:600; margin-top:auto; padding-top:6px; }
+.card.on { border-color:var(--turq); background:#eaf7f6; }
+.card:has(input:focus-visible) { outline:2px solid var(--turq); outline-offset:2px; }
+.note { color:var(--turq); margin:10px 0 0; font-size:14px; }
+.group { margin-bottom:16px; } .group h3 { margin:0 0 6px; font-size:15px; color:var(--soft); font-weight:600; }
+.group ul { list-style:none; margin:0; padding:0; background:var(--paper); border:1px solid var(--line); border-radius:14px; }
+.group li + li { border-top:1px solid var(--line); }
+.group label { display:flex; align-items:center; gap:12px; padding:12px 14px; cursor:pointer; }
+.group label span { flex:1; } .group label em { font-style:normal; color:var(--soft); font-size:14px; white-space:nowrap; }
+input[type=checkbox], input[type=radio] { accent-color:var(--turq); width:18px; height:18px; }
+.radios { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { display:flex; gap:8px; align-items:center; padding:10px 14px; border:2px solid var(--line); border-radius:999px; background:var(--paper); cursor:pointer; }
+.chip.on { border-color:var(--turq); background:#eaf7f6; }
+.fields { display:grid; gap:12px; grid-template-columns:1fr 1fr; margin-bottom:16px; }
+.fields label { display:grid; gap:6px; font-size:14px; color:var(--soft); } .fields .full { grid-column:1/-1; }
+.fields input, .fields textarea { padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--paper); font-size:16px; color:var(--ink); resize:vertical; }
+@media (max-width:600px) { .fields { grid-template-columns:1fr; } }
+.hp { position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+.err { color:#b3261e; margin:0 0 12px; }
+.primary { border:0; border-radius:14px; padding:15px 28px; background:var(--saffron); color:#2d2100; font-weight:700; font-size:17px; }
+.estimate { background:var(--indigo); color:#fff; border-radius:22px; padding:22px; position:sticky; top:16px; }
+.label { margin:0; color:rgba(255,255,255,.65); font-size:13px; }
+.price { margin:2px 0 0; font-family:"Montserrat Alternates",sans-serif; font-weight:700; font-size:30px; line-height:1.15; font-variant-numeric:tabular-nums; }
+.range { margin:4px 0 18px; color:rgba(255,255,255,.65); font-size:14px; }
+.days { margin:2px 0 12px; font-size:20px; font-weight:600; }
+.timeline { display:flex; gap:4px; height:8px; margin-bottom:10px; }
+.timeline i { border-radius:4px; background:var(--saffron); } .timeline i:nth-child(2) { background:var(--turq); } .timeline i:nth-child(3) { background:#8fb3ff; }
+.phases, .lines { list-style:none; margin:0; padding:0; font-size:14px; }
+.phases li, .lines li { display:flex; justify-content:space-between; gap:12px; padding:4px 0; color:rgba(255,255,255,.85); }
+details { margin-top:14px; } summary { cursor:pointer; color:rgba(255,255,255,.85); font-size:14px; }
+.lines li { border-top:1px solid rgba(255,255,255,.12); } .lines b { white-space:nowrap; font-weight:500; }
+.fine { margin:16px 0 0; font-size:12px; color:rgba(255,255,255,.55); line-height:1.4; }
+@media (max-width:899px) {
+  .estimate { position:fixed; left:0; right:0; bottom:0; top:auto; border-radius:20px 20px 0 0; padding:12px 20px; z-index:5; }
+  .estimate .label, .estimate .timeline, .estimate .phases, .estimate details, .estimate .fine { display:none; }
+  .price { font-size:22px; } .range { margin:0; font-size:13px; } .days { font-size:14px; margin:0; position:absolute; right:20px; top:14px; }
+}
+.done { background:var(--paper); border:2px solid var(--turq); border-radius:20px; padding:28px; max-width:640px; margin-bottom:60px; }
+.done h2 { margin:0 0 8px; font-family:"Montserrat Alternates",sans-serif; color:var(--indigo); } .soft { color:var(--soft); }
+@media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
