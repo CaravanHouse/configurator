@@ -58,11 +58,18 @@ export default function App() {
 
   return (
     <>
-      <div className="band">
-        <div className="wrap bar"><span className="logo">CaravanHouse</span><span className="tag">боты · сайты · мини-аппы</span></div>
-      </div>
+      <header className="band">
+        <div className="wrap bar">
+          <a className="logo" href="https://caravanhouse.uz" aria-label="CaravanHouse — на главный сайт">
+            <img src="/emblem.png" alt="" width={44} height={32} />
+            <span>Caravan<b>House</b></span>
+          </a>
+          <span className="tag">боты · сайты · мини-аппы</span>
+          <a className="site" href="https://caravanhouse.uz">caravanhouse.uz ↗</a>
+        </div>
+      </header>
 
-      <div className="wrap">
+      <main className="wrap">
         <section className="hero">
           <h1>Соберите проект — смета появится сразу</h1>
           <p>Отметьте, что нужно сделать, и посмотрите примерную стоимость и срок. Понравится — оставьте контакт, мы свяжемся и уточним детали.</p>
@@ -166,7 +173,7 @@ export default function App() {
             </aside>
           </div>
         )}
-      </div>
+      </main>
     </>
   );
 }
