@@ -6,6 +6,7 @@ import { createApp } from "./app";
 import { onRailway } from "./env";
 import { Leads, type Notifier } from "./leads";
 import { registerHandlers, telegramNotifier } from "./bot";
+import { orderBotNotifier } from "./orderBot";
 
 const token = process.env.BOT_TOKEN;
 const adminChatId = process.env.ADMIN_CHAT_ID;
@@ -14,8 +15,13 @@ const port = Number(process.env.PORT ?? 3000);
 const dataDir = process.env.DATA_DIR || join(process.cwd(), "data");
 
 const bot = token ? new Bot(token) : null;
-const notifier: Notifier =
+const direct: Notifier =
   bot && adminChatId ? telegramNotifier(bot.api, adminChatId) : { async newLead(l) { console.log("Новая заявка (Telegram не настроен):", l.id, l.name); } };
+// Основной путь — бот заказов @CaravanHousebot (группа «Заказы» с голосованием), запасной — свой бот админу
+const orderBotUrl = process.env.ORDER_BOT_URL;
+const leadSecret = process.env.LEAD_SECRET;
+const notifier: Notifier = orderBotUrl && leadSecret ? orderBotNotifier({ url: orderBotUrl, secret: leadSecret, fallback: direct }) : direct;
+console.log(orderBotUrl && leadSecret ? "Заявки уходят в бота заказов (группа «Заказы»)" : "ORDER_BOT_URL/LEAD_SECRET не заданы: заявки идут напрямую админу");
 if (!bot) console.warn("BOT_TOKEN не задан: заявки только сохраняются в data/leads.json");
 if (bot && !adminChatId) console.warn("ADMIN_CHAT_ID не задан: напишите боту /id и впишите значение в .env");
 

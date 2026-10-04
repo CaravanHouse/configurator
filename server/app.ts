@@ -31,7 +31,7 @@ export function createApp(leads: Leads, distDir: string, trustProxy = false) {
     if (contact.length < 3 || contact.length > 80) { res.status(400).json({ error: "Укажите Telegram или телефон" }); return; }
     if (!leads.allowed(req.ip ?? "unknown")) { res.status(429).json({ error: "Слишком много заявок, попробуйте позже" }); return; }
 
-    const lead = leads.create({ name, contact, comment, selection });
+    const lead = leads.create({ name, contact, comment, selection }, { ip: req.ip });
     res.json({ ok: true, id: lead.id });
   });
 
