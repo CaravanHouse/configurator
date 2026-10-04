@@ -1,9 +1,9 @@
 /**
  * Прайс CaravanHouse — единый источник цен.
- * Стартовые цены («от») утверждены: лендинг 1,5 млн, бот 2 млн, корпоративный сайт 3 млн, Mini App 5 млн.
+ * Стартовые цены («от») утверждены: лендинг 700 тыс., бот 1,2 млн, корпоративный сайт 1,9 млн, Mini App 2,6 млн.
  * Отсюда же их берёт caravanhouse.uz (GET /api/prices), поэтому менять цены нужно только здесь.
  * Доп. функции — по 100 000 сум (решение команды). Исключение: «Корпоративный сайт: больше 5 страниц» —
- * это переход с лендинга на корпоративный сайт, из него складывается цена «корпоративный сайт от 3 млн».
+ * это переход с лендинга на корпоративный сайт, из него складывается цена «корпоративный сайт от 1,9 млн».
  */
 export type TypeId = "bot" | "site" | "miniapp";
 export interface Feature { id: string; title: string; price: number; days: number }
@@ -11,7 +11,7 @@ export interface ProjectType { id: TypeId; title: string; tagline: string; base:
 
 export const TYPES: ProjectType[] = [
   {
-    id: "bot", title: "Telegram-бот", tagline: "Заказы, записи и ответы клиентам 24/7", base: 2_000_000, days: 7,
+    id: "bot", title: "Telegram-бот", tagline: "Заказы, записи и ответы клиентам 24/7", base: 1_200_000, days: 7,
     features: [
       { id: "bot-orders", title: "Приём заказов и каталог", price: 100_000, days: 4 },
       { id: "bot-booking", title: "Онлайн-запись на время", price: 100_000, days: 4 },
@@ -22,9 +22,9 @@ export const TYPES: ProjectType[] = [
     ],
   },
   {
-    id: "site", title: "Сайт", tagline: "Лендинг, а с опцией ниже — корпоративный сайт", base: 1_500_000, days: 7,
+    id: "site", title: "Сайт", tagline: "Лендинг, а с опцией ниже — корпоративный сайт", base: 700_000, days: 7,
     features: [
-      { id: "site-pages", title: "Корпоративный сайт: больше 5 страниц", price: 1_500_000, days: 7 },
+      { id: "site-pages", title: "Корпоративный сайт: больше 5 страниц", price: 1_200_000, days: 7 },
       { id: "site-cms", title: "Админка для редактирования контента", price: 100_000, days: 6 },
       { id: "site-anim", title: "Анимации и интерактив", price: 100_000, days: 4 },
       { id: "site-lang", title: "Русский и узбекский язык", price: 100_000, days: 3 },
@@ -33,7 +33,7 @@ export const TYPES: ProjectType[] = [
     ],
   },
   {
-    id: "miniapp", title: "Telegram Mini App", tagline: "Магазин или сервис внутри Telegram", base: 5_000_000, days: 14,
+    id: "miniapp", title: "Telegram Mini App", tagline: "Магазин или сервис внутри Telegram", base: 2_600_000, days: 14,
     features: [
       { id: "app-catalog", title: "Каталог и корзина", price: 100_000, days: 6 },
       { id: "app-pay", title: "Оплата внутри приложения (по запросу)", price: 100_000, days: 5 },
