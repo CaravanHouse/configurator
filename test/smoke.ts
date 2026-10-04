@@ -6,7 +6,7 @@ import type { AddressInfo } from "node:net";
 import { Bot } from "grammy";
 import { STARTING_PRICES, estimate, priceRange, rangeLabel, validateSelection } from "../shared/pricing";
 import { Leads, type Lead } from "../server/leads";
-import { createApp } from "../server/app";
+import { clientIp, createApp } from "../server/app";
 import { registerHandlers, leadText } from "../server/bot";
 import { orderBotNotifier, orderBotPayload } from "../server/orderBot";
 
@@ -108,6 +108,12 @@ const errFetch = (async () => new Response("{}", { status: 500 })) as unknown as
 await orderBotNotifier({ url: "https://bot.example", secret: "s3", fallback, fetchImpl: downFetch }).newLead(sample);
 await orderBotNotifier({ url: "https://bot.example", secret: "s3", fallback, fetchImpl: errFetch }).newLead(sample);
 assert.equal(fallbackGot.length, 2, "бот недоступен или 500 → запасной канал");
+
+// 6. IP посетителя за несколькими прокси
+const fakeReq = (h: Record<string, string>, ip = "10.1.1.1") => ({ ip, header: (n: string) => h[n.toLowerCase()] }) as Parameters<typeof clientIp>[0];
+assert.deepEqual(clientIp(fakeReq({ "x-real-ip": "82.215.82.106", "x-forwarded-for": "82.215.82.106, 152.233.15.123" }), true), { ip: "82.215.82.106", via: "x-real-ip" });
+assert.equal(clientIp(fakeReq({ "x-forwarded-for": "82.215.82.106, 152.233.15.123" }), true).ip, "82.215.82.106", "первый адрес цепочки, а не прокси");
+assert.equal(clientIp(fakeReq({ "x-real-ip": "9.9.9.9" }), false).ip, "10.1.1.1", "без trust proxy заголовкам не верим");
 
 console.log("✓ все проверки пройдены");
 process.exit(0);
