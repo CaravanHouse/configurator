@@ -8,7 +8,7 @@ export interface Lead {
 }
 interface DbShape { seq: number; leads: Lead[] }
 
-export interface Notifier { newLead(lead: Lead): Promise<void> }
+export interface Notifier { newLead(lead: Lead, meta?: { ip?: string }): Promise<void> }
 
 export class Leads {
   db: JsonDb<DbShape>;
@@ -25,12 +25,12 @@ export class Leads {
     return true;
   }
 
-  create(input: { name: string; contact: string; comment: string; selection: Selection }): Lead {
+  create(input: { name: string; contact: string; comment: string; selection: Selection }, meta?: { ip?: string }): Lead {
     const e = estimate(input.selection); // сумму всегда считаем на сервере, клиенту не верим
     const lead: Lead = { id: ++this.db.data.seq, createdAt: Date.now(), status: "new", ...input, total: e.total, days: e.days };
     this.db.data.leads.push(lead);
     this.db.save();
-    void this.notifier.newLead(lead).catch((err) => console.error("Не удалось отправить заявку в Telegram:", err.message));
+    void this.notifier.newLead(lead, meta).catch((err) => console.error("Не удалось отправить заявку в Telegram:", err.message));
     return lead;
   }
 

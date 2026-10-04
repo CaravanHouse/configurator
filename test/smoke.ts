@@ -8,6 +8,7 @@ import { STARTING_PRICES, estimate, priceRange, rangeLabel, validateSelection } 
 import { Leads, type Lead } from "../server/leads";
 import { createApp } from "../server/app";
 import { registerHandlers, leadText } from "../server/bot";
+import { orderBotNotifier, orderBotPayload } from "../server/orderBot";
 
 // 1. смета
 const empty = estimate({ types: [], features: [], urgency: "normal" });
@@ -80,6 +81,33 @@ const edits = calls.filter((c) => c.method === "editMessageText").length;
 await bot.handleUpdate(cb(555, "lead:1:taken"));
 assert.equal(calls.filter((c) => c.method === "editMessageText").length, edits, "повторный тап не редактирует сообщение");
 assert.equal(calls.at(-1)?.method, "answerCallbackQuery", "но кнопка отвечает");
+
+// 5. заявки уходят в бота заказов @CaravanHousebot, при сбое — запасной канал
+const sample = sent[0];
+const payload = orderBotPayload(sample);
+assert.equal(payload.source, "calc");
+assert.equal(payload.service, "bot", "одно направление → его услуга");
+assert.equal(payload.budget, "≈ 2–3 млн сум", "в бота уходит вилка, а не точная сумма");
+assert.match(payload.message, /Приём заказов и каталог/);
+assert.equal(orderBotPayload({ ...sample, selection: { ...sample.selection, types: ["bot", "site"] } }).service, "other", "несколько направлений → другое");
+
+const fallbackGot: number[] = [];
+const fallback = { async newLead(l: Lead) { fallbackGot.push(l.id); } };
+let request: { url: string; headers: Record<string, string>; body: Record<string, unknown> } | null = null;
+const okFetch = (async (url: string, init: RequestInit) => {
+  request = { url, headers: init.headers as Record<string, string>, body: JSON.parse(String(init.body)) };
+  return new Response("{}", { status: 200 });
+}) as unknown as typeof fetch;
+await orderBotNotifier({ url: "https://bot.example/", secret: "s3", fallback, fetchImpl: okFetch }).newLead(sample, { ip: "1.2.3.4" });
+assert.equal(request!.url, "https://bot.example/lead");
+assert.equal(request!.headers["X-Lead-Secret"], "s3");
+assert.equal(request!.headers["X-Client-IP"], "1.2.3.4", "IP клиента передаётся для лимита");
+assert.equal(fallbackGot.length, 0, "при успехе запасной канал не нужен");
+const downFetch = (async () => { throw new Error("ECONNREFUSED"); }) as unknown as typeof fetch;
+const errFetch = (async () => new Response("{}", { status: 500 })) as unknown as typeof fetch;
+await orderBotNotifier({ url: "https://bot.example", secret: "s3", fallback, fetchImpl: downFetch }).newLead(sample);
+await orderBotNotifier({ url: "https://bot.example", secret: "s3", fallback, fetchImpl: errFetch }).newLead(sample);
+assert.equal(fallbackGot.length, 2, "бот недоступен или 500 → запасной канал");
 
 console.log("✓ все проверки пройдены");
 process.exit(0);
