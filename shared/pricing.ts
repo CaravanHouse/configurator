@@ -1,7 +1,8 @@
 /**
- * ВНИМАНИЕ: все цены и сроки ниже — ПРИМЕРНЫЕ ЗАГЛУШКИ для демо.
- * Замените их на реальный прайс CaravanHouse: достаточно поправить числа в этом файле,
- * сайт и сервер считают смету из одного источника.
+ * Прайс CaravanHouse — единый источник цен.
+ * Стартовые цены («от») утверждены: лендинг 1,5 млн, бот 2 млн, корпоративный сайт 3 млн, Mini App 5 млн.
+ * Отсюда же их берёт caravanhouse.uz (GET /api/prices), поэтому менять цены нужно только здесь.
+ * TODO: цены и сроки отдельных функций (features) пока примерные — уточните под реальный прайс.
  */
 export type TypeId = "bot" | "site" | "miniapp";
 export interface Feature { id: string; title: string; price: number; days: number }
@@ -9,20 +10,20 @@ export interface ProjectType { id: TypeId; title: string; tagline: string; base:
 
 export const TYPES: ProjectType[] = [
   {
-    id: "bot", title: "Telegram-бот", tagline: "Заказы, записи и ответы клиентам 24/7", base: 1_800_000, days: 7,
+    id: "bot", title: "Telegram-бот", tagline: "Заказы, записи и ответы клиентам 24/7", base: 2_000_000, days: 7,
     features: [
       { id: "bot-orders", title: "Приём заказов и каталог", price: 700_000, days: 4 },
       { id: "bot-booking", title: "Онлайн-запись на время", price: 600_000, days: 4 },
-      { id: "bot-pay", title: "Оплата (Click / Payme)", price: 900_000, days: 4 },
+      { id: "bot-pay", title: "Оплата Click / Payme (по запросу)", price: 900_000, days: 4 },
       { id: "bot-admin", title: "Админ-панель прямо в Telegram", price: 800_000, days: 5 },
       { id: "bot-broadcast", title: "Рассылки по клиентам", price: 400_000, days: 2 },
       { id: "bot-lang", title: "Русский и узбекский язык", price: 300_000, days: 2 },
     ],
   },
   {
-    id: "site", title: "Сайт", tagline: "Лендинг или многостраничный сайт под ключ", base: 2_500_000, days: 10,
+    id: "site", title: "Сайт", tagline: "Лендинг, а с опцией ниже — корпоративный сайт", base: 1_500_000, days: 7,
     features: [
-      { id: "site-pages", title: "Больше 5 страниц", price: 900_000, days: 5 },
+      { id: "site-pages", title: "Корпоративный сайт: больше 5 страниц", price: 1_500_000, days: 7 },
       { id: "site-cms", title: "Админка для редактирования контента", price: 1_200_000, days: 6 },
       { id: "site-anim", title: "Анимации и интерактив", price: 700_000, days: 4 },
       { id: "site-lang", title: "Русский и узбекский язык", price: 400_000, days: 3 },
@@ -31,10 +32,10 @@ export const TYPES: ProjectType[] = [
     ],
   },
   {
-    id: "miniapp", title: "Telegram Mini App", tagline: "Магазин или сервис внутри Telegram", base: 3_500_000, days: 14,
+    id: "miniapp", title: "Telegram Mini App", tagline: "Магазин или сервис внутри Telegram", base: 5_000_000, days: 14,
     features: [
       { id: "app-catalog", title: "Каталог и корзина", price: 1_000_000, days: 6 },
-      { id: "app-pay", title: "Оплата внутри приложения", price: 1_000_000, days: 5 },
+      { id: "app-pay", title: "Оплата внутри приложения (по запросу)", price: 1_000_000, days: 5 },
       { id: "app-account", title: "Личный кабинет клиента", price: 900_000, days: 5 },
       { id: "app-admin", title: "Панель владельца", price: 1_300_000, days: 7 },
       { id: "app-push", title: "Уведомления через бота", price: 400_000, days: 2 },
@@ -96,3 +97,29 @@ export function validateSelection(raw: unknown): Selection | null {
 }
 
 export const money = (n: number) => `${n.toLocaleString("ru-RU")} сум`;
+
+const typeById = (id: TypeId) => TYPES.find((t) => t.id === id)!;
+const featurePrice = (typeId: TypeId, featureId: string) => typeById(typeId).features.find((f) => f.id === featureId)!.price;
+
+/** Стартовые цены для сайта caravanhouse.uz: всегда «от», считаются из TYPES выше */
+export const STARTING_PRICES: { id: "landing" | "bot" | "corporate" | "miniapp"; from: number }[] = [
+  { id: "landing", from: typeById("site").base },
+  { id: "bot", from: typeById("bot").base },
+  { id: "corporate", from: typeById("site").base + featurePrice("site", "site-pages") },
+  { id: "miniapp", from: typeById("miniapp").base },
+];
+
+/** Предоплата перед стартом, остальное — после сдачи */
+export const PREPAYMENT_PERCENT = 50;
+
+/** Смету показываем вилкой, а не точной цифрой: шаг 0,5 млн (до 10 млн) или 1 млн */
+export function priceRange(e: Pick<Estimate, "total" | "totalMax">): { from: number; to: number } {
+  const step = e.totalMax >= 10_000_000 ? 1_000_000 : 500_000;
+  const from = Math.max(step, Math.floor(e.total / step) * step);
+  let to = Math.ceil(e.totalMax / step) * step;
+  if (to <= from) to = from + step;
+  return { from, to };
+}
+
+const millions = (n: number) => (n / 1_000_000).toLocaleString("ru-RU", { maximumFractionDigits: 1 });
+export const rangeLabel = (r: { from: number; to: number }) => `≈ ${millions(r.from)}–${millions(r.to)} млн сум`;

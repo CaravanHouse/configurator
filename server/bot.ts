@@ -1,6 +1,6 @@
 import { Api, Bot, InlineKeyboard } from "grammy";
 import type { Lead, LeadStatus, Leads, Notifier } from "./leads";
-import { TYPES, URGENCY, money } from "../shared/pricing";
+import { TYPES, URGENCY, money, priceRange, rangeLabel } from "../shared/pricing";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const STATUS_LINE: Record<LeadStatus, string> = { new: "🆕 Новая", taken: "🔧 В работе", done: "✅ Готово", rejected: "🚫 Отклонена" };
@@ -15,7 +15,7 @@ export function leadText(l: Lead): string {
     `<b>${types.map((t) => t.title).join(" + ")}</b>`,
     ...(feats.length ? feats : ["• без доп. функций"]),
     "",
-    `💰 ~ <b>${money(l.total)}</b> · ⏱ ~ <b>${l.days} дн.</b> · ${esc(URGENCY[l.selection.urgency].title)}`,
+    `💰 <b>${rangeLabel(priceRange({ total: l.total, totalMax: Math.round(l.total * 1.2) }))}</b> (расчёт: ${money(l.total)}) · ⏱ ~ <b>${l.days} дн.</b> · ${esc(URGENCY[l.selection.urgency].title)}`,
     "",
     `👤 ${esc(l.name)}`,
     `📞 ${esc(l.contact)}`,

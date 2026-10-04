@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { TYPES, URGENCY, estimate, money, type Selection, type TypeId, type UrgencyId } from "../../shared/pricing";
+import { PREPAYMENT_PERCENT, TYPES, URGENCY, estimate, money, priceRange, rangeLabel, type Selection, type TypeId, type UrgencyId } from "../../shared/pricing";
 import { useTween } from "./useTween";
 
 type Phase = { name: "form" } | { name: "sending" } | { name: "done"; id: number } | { name: "error"; message: string };
@@ -79,7 +79,7 @@ export default function App() {
           <section className="done" role="status">
             <h2>Заявка №{phase.id} отправлена</h2>
             <p>Мы получили её в Telegram и напишем вам по указанному контакту.</p>
-            <p className="soft">Вы запросили: {TYPES.filter((t) => types.includes(t.id)).map((t) => t.title).join(" + ")}, примерно {money(est.total)} и {est.days} дн.</p>
+            <p className="soft">Вы запросили: {TYPES.filter((t) => types.includes(t.id)).map((t) => t.title).join(" + ")}, {rangeLabel(priceRange(est))} и примерно {est.days} дн.</p>
             <button className="primary" onClick={reset}>Собрать ещё один проект</button>
           </section>
         ) : (
@@ -147,8 +147,8 @@ export default function App() {
 
             <aside className="estimate" aria-live="polite">
               <p className="label">Примерная стоимость</p>
-              <p className="price">{empty ? "—" : money(Math.round(total / 10_000) * 10_000)}</p>
-              <p className="range">{empty ? "Выберите направление слева" : `до ${money(est.totalMax)} с учётом уточнений`}</p>
+              <p className="price">{empty ? "—" : rangeLabel(priceRange({ total: Math.round(total / 10_000) * 10_000, totalMax: est.totalMax }))}</p>
+              <p className="range">{empty ? "Выберите направление слева" : "Точную цену назовём после короткого разговора"}</p>
 
               {!empty && (
                 <>
@@ -160,16 +160,9 @@ export default function App() {
                   <ul className="phases">
                     {PHASES.map((p) => <li key={p.title}><span>{p.title}</span><b>{Math.max(1, Math.round(est.days * p.share))} дн.</b></li>)}
                   </ul>
-                  <details>
-                    <summary>Из чего складывается</summary>
-                    <ul className="lines">
-                      {est.lines.map((l, i) => <li key={i}><span>{l.title}</span><b>{money(l.price)}</b></li>)}
-                      {est.discount > 0 && <li><span>Скидка за комплекс</span><b>−{money(est.discount)}</b></li>}
-                    </ul>
-                  </details>
                 </>
               )}
-              <p className="fine">Это ориентир, а не оферта. Точную цену назовём после короткого разговора.</p>
+              <p className="fine">Это ориентир, а не оферта. Оплата: {PREPAYMENT_PERCENT}% предоплата перед стартом, {100 - PREPAYMENT_PERCENT}% после сдачи.</p>
             </aside>
           </div>
         )}
