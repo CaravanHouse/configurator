@@ -2,13 +2,20 @@ import express from "express";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Leads } from "./leads";
-import { validateSelection } from "../shared/pricing";
+import { PREPAYMENT_PERCENT, STARTING_PRICES, validateSelection } from "../shared/pricing";
 
 export function createApp(leads: Leads, distDir: string, trustProxy = false) {
   const app = express();
   if (trustProxy) app.set("trust proxy", 1);
   app.use(express.json({ limit: "20kb" }));
   app.get("/health", (_q, r) => { r.json({ ok: true }); });
+
+  // Стартовые цены для caravanhouse.uz: сайт забирает их отсюда, чтобы цены жили в одном месте
+  app.get("/api/prices", (_q, r) => {
+    r.set("Access-Control-Allow-Origin", "*");
+    r.set("Cache-Control", "public, max-age=300");
+    r.json({ currency: "UZS", prepaymentPercent: PREPAYMENT_PERCENT, starting: STARTING_PRICES });
+  });
 
   app.post("/api/lead", (req, res) => {
     const b = req.body ?? {};
