@@ -2,7 +2,8 @@
  * Прайс CaravanHouse — единый источник цен.
  * Стартовые цены («от») утверждены: лендинг 1,5 млн, бот 2 млн, корпоративный сайт 3 млн, Mini App 5 млн.
  * Отсюда же их берёт caravanhouse.uz (GET /api/prices), поэтому менять цены нужно только здесь.
- * TODO: цены и сроки отдельных функций (features) пока примерные — уточните под реальный прайс.
+ * Доп. функции — по 100 000 сум (решение команды). Исключение: «Корпоративный сайт: больше 5 страниц» —
+ * это переход с лендинга на корпоративный сайт, из него складывается цена «корпоративный сайт от 3 млн».
  */
 export type TypeId = "bot" | "site" | "miniapp";
 export interface Feature { id: string; title: string; price: number; days: number }
@@ -12,34 +13,34 @@ export const TYPES: ProjectType[] = [
   {
     id: "bot", title: "Telegram-бот", tagline: "Заказы, записи и ответы клиентам 24/7", base: 2_000_000, days: 7,
     features: [
-      { id: "bot-orders", title: "Приём заказов и каталог", price: 700_000, days: 4 },
-      { id: "bot-booking", title: "Онлайн-запись на время", price: 600_000, days: 4 },
-      { id: "bot-pay", title: "Оплата Click / Payme (по запросу)", price: 900_000, days: 4 },
-      { id: "bot-admin", title: "Админ-панель прямо в Telegram", price: 800_000, days: 5 },
-      { id: "bot-broadcast", title: "Рассылки по клиентам", price: 400_000, days: 2 },
-      { id: "bot-lang", title: "Русский и узбекский язык", price: 300_000, days: 2 },
+      { id: "bot-orders", title: "Приём заказов и каталог", price: 100_000, days: 4 },
+      { id: "bot-booking", title: "Онлайн-запись на время", price: 100_000, days: 4 },
+      { id: "bot-pay", title: "Оплата Click / Payme (по запросу)", price: 100_000, days: 4 },
+      { id: "bot-admin", title: "Админ-панель прямо в Telegram", price: 100_000, days: 5 },
+      { id: "bot-broadcast", title: "Рассылки по клиентам", price: 100_000, days: 2 },
+      { id: "bot-lang", title: "Русский и узбекский язык", price: 100_000, days: 2 },
     ],
   },
   {
     id: "site", title: "Сайт", tagline: "Лендинг, а с опцией ниже — корпоративный сайт", base: 1_500_000, days: 7,
     features: [
       { id: "site-pages", title: "Корпоративный сайт: больше 5 страниц", price: 1_500_000, days: 7 },
-      { id: "site-cms", title: "Админка для редактирования контента", price: 1_200_000, days: 6 },
-      { id: "site-anim", title: "Анимации и интерактив", price: 700_000, days: 4 },
-      { id: "site-lang", title: "Русский и узбекский язык", price: 400_000, days: 3 },
-      { id: "site-seo", title: "SEO-настройка и аналитика", price: 500_000, days: 3 },
-      { id: "site-leads", title: "Заявки с сайта в Telegram", price: 300_000, days: 1 },
+      { id: "site-cms", title: "Админка для редактирования контента", price: 100_000, days: 6 },
+      { id: "site-anim", title: "Анимации и интерактив", price: 100_000, days: 4 },
+      { id: "site-lang", title: "Русский и узбекский язык", price: 100_000, days: 3 },
+      { id: "site-seo", title: "SEO-настройка и аналитика", price: 100_000, days: 3 },
+      { id: "site-leads", title: "Заявки с сайта в Telegram", price: 100_000, days: 1 },
     ],
   },
   {
     id: "miniapp", title: "Telegram Mini App", tagline: "Магазин или сервис внутри Telegram", base: 5_000_000, days: 14,
     features: [
-      { id: "app-catalog", title: "Каталог и корзина", price: 1_000_000, days: 6 },
-      { id: "app-pay", title: "Оплата внутри приложения (по запросу)", price: 1_000_000, days: 5 },
-      { id: "app-account", title: "Личный кабинет клиента", price: 900_000, days: 5 },
-      { id: "app-admin", title: "Панель владельца", price: 1_300_000, days: 7 },
-      { id: "app-push", title: "Уведомления через бота", price: 400_000, days: 2 },
-      { id: "app-lang", title: "Русский и узбекский язык", price: 400_000, days: 3 },
+      { id: "app-catalog", title: "Каталог и корзина", price: 100_000, days: 6 },
+      { id: "app-pay", title: "Оплата внутри приложения (по запросу)", price: 100_000, days: 5 },
+      { id: "app-account", title: "Личный кабинет клиента", price: 100_000, days: 5 },
+      { id: "app-admin", title: "Панель владельца", price: 100_000, days: 7 },
+      { id: "app-push", title: "Уведомления через бота", price: 100_000, days: 2 },
+      { id: "app-lang", title: "Русский и узбекский язык", price: 100_000, days: 3 },
     ],
   },
 ];
@@ -108,6 +109,9 @@ export const STARTING_PRICES: { id: "landing" | "bot" | "corporate" | "miniapp";
   { id: "corporate", from: typeById("site").base + featurePrice("site", "site-pages") },
   { id: "miniapp", from: typeById("miniapp").base },
 ];
+
+/** Поддержка после бесплатного первого месяца: правки и исправление ошибок, новый функционал — отдельно */
+export const SUPPORT_MONTHLY_FROM = 300_000;
 
 /** Предоплата перед стартом, остальное — после сдачи */
 export const PREPAYMENT_PERCENT = 50;

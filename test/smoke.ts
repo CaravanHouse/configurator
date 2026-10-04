@@ -13,7 +13,7 @@ import { registerHandlers, leadText } from "../server/bot";
 const empty = estimate({ types: [], features: [], urgency: "normal" });
 assert.equal(empty.total, 0);
 const bot1 = estimate({ types: ["bot"], features: ["bot-orders"], urgency: "normal" });
-assert.equal(bot1.total, 2_700_000, "бот + заказы = 2.0 + 0.7 млн");
+assert.equal(bot1.total, 2_100_000, "бот + заказы = 2.0 + 0.1 млн");
 const combo = estimate({ types: ["bot", "site"], features: [], urgency: "normal" });
 assert.equal(combo.total, Math.round(((2_000_000 + 1_500_000) * 0.9) / 10_000) * 10_000, "скидка 10% за комплекс");
 const rush = estimate({ types: ["bot"], features: [], urgency: "rush" });
@@ -22,8 +22,8 @@ assert.ok(rush.total > estimate({ types: ["bot"], features: [], urgency: "normal
 // 1б. стартовые цены «от» (сайт берёт их через /api/prices) и вилка вместо точной цифры
 assert.deepEqual(Object.fromEntries(STARTING_PRICES.map((p) => [p.id, p.from])), { landing: 1_500_000, bot: 2_000_000, corporate: 3_000_000, miniapp: 5_000_000 }, "утверждённые цены «от»");
 const range = priceRange(estimate({ types: ["bot"], features: ["bot-orders"], urgency: "normal" }));
-assert.deepEqual(range, { from: 2_500_000, to: 3_500_000 }, "2,7 млн показываем вилкой 2,5–3,5");
-assert.equal(rangeLabel(range), "≈ 2,5–3,5 млн сум");
+assert.deepEqual(range, { from: 2_000_000, to: 3_000_000 }, "2,1 млн показываем вилкой 2–3");
+assert.equal(rangeLabel(range), "≈ 2–3 млн сум");
 assert.deepEqual(priceRange({ total: 3_000_000, totalMax: 3_000_000 }), { from: 3_000_000, to: 3_500_000 }, "вилка не схлопывается в одно число");
 
 // 2. валидация выбора
@@ -51,10 +51,11 @@ const ok = await post({ ...valid, total: 1 }); // клиентскую сумм�
 assert.equal(ok.status, 200);
 await new Promise((r) => setTimeout(r, 10));
 assert.equal(sent.length, 1);
-assert.equal(sent[0].total, 2_700_000, "сумму считает сервер");
+assert.equal(sent[0].total, 2_100_000, "сумму считает сервер");
 assert.ok(leadText(sent[0]).includes("&lt;b&gt;тест"), "HTML в комментарии экранируется");
 const prices = await (await fetch(base + "/api/prices")).json() as { prepaymentPercent: number; starting: { id: string; from: number }[] };
 assert.equal(prices.prepaymentPercent, 50);
+assert.equal((prices as { supportMonthlyFrom?: number }).supportMonthlyFrom, 300_000, "поддержка от 300 000 в месяц");
 assert.equal(prices.starting.find((p) => p.id === "corporate")?.from, 3_000_000, "/api/prices отдаёт цены «от»");
 for (let i = 0; i < 4; i++) await post(valid);
 assert.equal((await post(valid)).status, 429, "лимит 5 заявок в час");

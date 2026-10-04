@@ -2,7 +2,7 @@ import express from "express";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Leads } from "./leads";
-import { PREPAYMENT_PERCENT, STARTING_PRICES, validateSelection } from "../shared/pricing";
+import { PREPAYMENT_PERCENT, STARTING_PRICES, SUPPORT_MONTHLY_FROM, validateSelection } from "../shared/pricing";
 
 export function createApp(leads: Leads, distDir: string, trustProxy = false) {
   const app = express();
@@ -14,7 +14,7 @@ export function createApp(leads: Leads, distDir: string, trustProxy = false) {
   app.get("/api/prices", (_q, r) => {
     r.set("Access-Control-Allow-Origin", "*");
     r.set("Cache-Control", "public, max-age=300");
-    r.json({ currency: "UZS", prepaymentPercent: PREPAYMENT_PERCENT, starting: STARTING_PRICES });
+    r.json({ currency: "UZS", prepaymentPercent: PREPAYMENT_PERCENT, supportMonthlyFrom: SUPPORT_MONTHLY_FROM, starting: STARTING_PRICES });
   });
 
   app.post("/api/lead", (req, res) => {
