@@ -5,7 +5,7 @@ import type { Lead, Notifier } from "./leads";
 const SERVICE = { bot: "bot", site: "site", miniapp: "miniapp" } as const;
 
 /** Текст заявки для карточки в группе: что выбрано, функции, срочность и комментарий клиента */
-export function leadSummary(l: Lead): string {
+function leadSummary(l: Lead): string {
   const types = TYPES.filter((t) => l.selection.types.includes(t.id));
   const features = types.flatMap((t) => t.features.filter((f) => l.selection.features.includes(f.id)).map((f) => f.title));
   return [

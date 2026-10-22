@@ -23,7 +23,7 @@ export function leadText(l: Lead): string {
   ].join("\n");
 }
 
-export function leadKeyboard(l: Lead): InlineKeyboard {
+function leadKeyboard(l: Lead): InlineKeyboard {
   const kb = new InlineKeyboard();
   if (l.status === "new") kb.text("🔧 Взять в работу", `lead:${l.id}:taken`).text("🚫 Отклонить", `lead:${l.id}:rejected`);
   else if (l.status === "taken") kb.text("✅ Готово", `lead:${l.id}:done`).text("↩️ Вернуть", `lead:${l.id}:new`);
