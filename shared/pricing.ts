@@ -51,8 +51,8 @@ export const URGENCY = {
 } as const;
 export type UrgencyId = keyof typeof URGENCY;
 
-export const BUNDLE_DISCOUNT = 0.1; // скидка, если выбрано 2+ направления
-export const BUNDLE_PARALLEL = 0.85; // части делаются параллельно, срок короче суммы
+const BUNDLE_DISCOUNT = 0.1; // скидка, если выбрано 2+ направления
+const BUNDLE_PARALLEL = 0.85; // части делаются параллельно, срок короче суммы
 
 export interface Selection { types: TypeId[]; features: string[]; urgency: UrgencyId }
 export interface Estimate {
